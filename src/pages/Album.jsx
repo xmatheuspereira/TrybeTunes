@@ -1,8 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import MusicCard from '../components/MusicCard';
 import getMusics from '../services/musicsAPI';
-import PropTypes from 'prop-types';
 
 class Album extends React.Component {
   state = {
@@ -13,8 +13,8 @@ class Album extends React.Component {
     const { match: { params: { id } } } = this.props;
     const trackList = await getMusics(id);
     this.setState({
-      musics: trackList,
-    })
+      musics: trackList.splice(1),
+    });
   };
 
   render() {
@@ -26,5 +26,11 @@ class Album extends React.Component {
     );
   }
 }
+
+// PropTypes.shape => um objeto que assume uma forma particular
+// Ref. https://pt-br.reactjs.org/docs/typechecking-with-proptypes.html#gatsby-focus-wrapper
+Album.propTypes = {
+  match: PropTypes.shape.isRequired,
+};
 
 export default Album;
