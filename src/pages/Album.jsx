@@ -12,16 +12,31 @@ class Album extends React.Component {
   componentDidMount = async () => {
     const { match: { params: { id } } } = this.props;
     const trackList = await getMusics(id);
+    const { artistName, collectionName } = trackList[0];
     this.setState({
-      musics: trackList.splice(1),
+      // Ref. https://www.delftstack.com/pt/howto/javascript/javascript-remove-first-element-from-array/
+      musics: trackList.filter((element, index) => index > 0),
+      collectionName,
+      artistName,
     });
   };
 
   render() {
+    const { musics, collectionName, artistName } = this.state;
+
     return (
       <div data-testid="page-album">
         <Header />
-        <MusicCard />
+        <h1 data-testid="artist-name">{artistName}</h1>
+        <h2 data-testid="album-name">{collectionName}</h2>
+        {musics.map(({ trackName, previewUrl }) => (
+          <div key={ trackName }>
+            <MusicCard
+              musicName={ trackName }
+              sample={ previewUrl }
+            />
+          </div>
+        ))}
       </div>
     );
   }
