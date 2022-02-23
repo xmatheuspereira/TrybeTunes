@@ -26,23 +26,19 @@ class Album extends React.Component {
     });
   };
 
-  addToFavorites = async () => {
+  addToFavorites = async (id) => {
     const { favorites } = this.state;
-    const { match: { params: { id } }, trackId } = this.props;
-
     this.setState({ isLoading: true });
-    const trackList = await getMusics(id);
-    const favoriteSongs = trackList.find((element) => element.trackId === trackId);
-
-    await addSong(favoriteSongs);
+    await addSong(id);
     this.setState({
-      favorites: [...favorites, favoriteSongs],
+      favorites: [...favorites, id],
       isLoading: false,
     });
   };
 
   render() {
     const { musics, collectionName, artistName, isLoading, favorites } = this.state;
+    console.log(favorites);
 
     return (
       <div data-testid="page-album">
@@ -57,8 +53,8 @@ class Album extends React.Component {
                 key={ trackName }
                 musicName={ trackName }
                 sample={ previewUrl }
-                onChange={ () => this.addToFavorites() }
-                isChecked={ favorites.some((id) => trackId === id) }
+                onChange={ () => this.addToFavorites(trackId) }
+                isChecked={ favorites.includes(trackId) }
               />
             </div>
           )))}
@@ -71,7 +67,6 @@ class Album extends React.Component {
 // Ref. https://pt-br.reactjs.org/docs/typechecking-with-proptypes.html#gatsby-focus-wrapper
 Album.propTypes = {
   match: PropTypes.shape.isRequired,
-  trackId: PropTypes.number.isRequired,
 };
 
 export default Album;
