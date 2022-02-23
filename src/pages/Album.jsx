@@ -2,15 +2,20 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Header from '../components/Header';
 import MusicCard from '../components/MusicCard';
+import Loading from '../components/Loading';
 import getMusics from '../services/musicsAPI';
+import { addSong } from '../services/favoriteSongsAPI';
 
 class Album extends React.Component {
   state = {
     musics: [],
+    favorites: [],
+    isLoading: false,
   }
 
   componentDidMount = async () => {
     const { match: { params: { id } } } = this.props;
+
     const trackList = await getMusics(id);
     const { artistName, collectionName } = trackList[0];
     this.setState({
@@ -21,22 +26,42 @@ class Album extends React.Component {
     });
   };
 
+  addToFavorites = async () => {
+    const { favorites } = this.state;
+    const { match: { params: { id } }, trackId } = this.props;
+
+    this.setState({ isLoading: true });
+    const trackList = await getMusics(id);
+    const favoriteSongs = trackList.find((element) => element.trackId === trackId);
+
+    await addSong(favoriteSongs);
+    this.setState({
+      favorites: [...favorites, favoriteSongs],
+      isLoading: false,
+    });
+  };
+
   render() {
-    const { musics, collectionName, artistName } = this.state;
+    const { musics, collectionName, artistName, isLoading, favorites } = this.state;
 
     return (
       <div data-testid="page-album">
         <Header />
         <h1 data-testid="artist-name">{artistName}</h1>
         <h2 data-testid="album-name">{collectionName}</h2>
-        {musics.map(({ trackName, previewUrl }) => (
-          <div key={ trackName }>
-            <MusicCard
-              musicName={ trackName }
-              sample={ previewUrl }
-            />
-          </div>
-        ))}
+        { isLoading ? <Loading /> : (
+          musics.map(({ trackName, previewUrl, trackId }) => (
+            <div key={ trackId }>
+              <MusicCard
+                trackId={ trackId }
+                key={ trackName }
+                musicName={ trackName }
+                sample={ previewUrl }
+                onChange={ () => this.addToFavorites() }
+                isChecked={ favorites.some((id) => trackId === id) }
+              />
+            </div>
+          )))}
       </div>
     );
   }
@@ -46,6 +71,7 @@ class Album extends React.Component {
 // Ref. https://pt-br.reactjs.org/docs/typechecking-with-proptypes.html#gatsby-focus-wrapper
 Album.propTypes = {
   match: PropTypes.shape.isRequired,
+  trackId: PropTypes.number.isRequired,
 };
 
 export default Album;
