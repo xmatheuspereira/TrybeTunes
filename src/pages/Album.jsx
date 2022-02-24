@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import MusicCard from '../components/MusicCard';
 import Loading from '../components/Loading';
 import getMusics from '../services/musicsAPI';
-import { addSong, getFavoriteSongs } from '../services/favoriteSongsAPI';
+import { addSong, getFavoriteSongs, removeSong } from '../services/favoriteSongsAPI';
 
 class Album extends React.Component {
   state = {
@@ -17,6 +17,9 @@ class Album extends React.Component {
     const { match: { params: { id } } } = this.props;
 
     const savedFavorites = await getFavoriteSongs();
+    this.setState({
+      favorites: savedFavorites.map((e) => e.trackId),
+    })
 
     const trackList = await getMusics(id);
     const { artistName, collectionName } = trackList[0];
@@ -25,7 +28,6 @@ class Album extends React.Component {
       musics: trackList.filter((element, index) => index > 0),
       collectionName,
       artistName,
-      favorites: savedFavorites.map((e) => e.trackId),
     });
   };
 
@@ -33,11 +35,12 @@ class Album extends React.Component {
     const { favorites } = this.state;
 
     this.setState({ isLoading: true });
-    await addSong(id);
 
-    if (favorites.some((e) => e === id)) {
-      this.setState({ isLoading: false });
+    if (favorites.includes(id)) {
+      await removeSong(id);
+      this.setState({ isLoading: false, favorites: favorites.slice(id) });
     } else {
+      await addSong(id);
       this.setState({
         favorites: [...favorites, id],
         isLoading: false,
