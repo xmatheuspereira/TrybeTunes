@@ -55,7 +55,6 @@ class Album extends React.Component {
 
   render() {
     const { musics, collectionName, artistName, isLoading, favorites } = this.state;
-    console.log(favorites);
 
     return (
       <div data-testid="page-album">
@@ -83,7 +82,11 @@ class Album extends React.Component {
 // PropTypes.shape => um objeto que assume uma forma particular
 // Ref. https://pt-br.reactjs.org/docs/typechecking-with-proptypes.html#gatsby-focus-wrapper
 Album.propTypes = {
-  match: PropTypes.shape.isRequired,
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }),
+  }).isRequired,
 };
 
 export default Album;
