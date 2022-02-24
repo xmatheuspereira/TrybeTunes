@@ -20,15 +20,14 @@ class Profile extends React.Component {
     const { name, email, image, description } = this.state;
 
     return (
-      <>
+      <div data-testid="page-profile">
         <Header />
-        <div data-testid="page-profile">Profile</div>
         <img data-testid="profile-image" src={ image } alt={ name } />
         <p>{ name }</p>
         <p>{ email }</p>
         <p>{ description }</p>
         <Link to="/profile/edit">Editar perfil</Link>
-      </>
+      </div>
     );
   }
 }
