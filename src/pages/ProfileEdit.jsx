@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Redirect } from 'react-router-dom';
 import Header from '../components/Header';
 import Loading from '../components/Loading';
 import { getUser, updateUser } from '../services/userAPI';
 
-class ProfileEdit extends Component {
+class ProfileEdit extends React.Component {
   state = {
     name: '',
     email: '',
