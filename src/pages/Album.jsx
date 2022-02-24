@@ -19,7 +19,7 @@ class Album extends React.Component {
     const savedFavorites = await getFavoriteSongs();
     this.setState({
       favorites: savedFavorites.map((e) => e.trackId),
-    })
+    });
 
     const trackList = await getMusics(id);
     const { artistName, collectionName } = trackList[0];
@@ -31,18 +31,23 @@ class Album extends React.Component {
     });
   };
 
-  addToFavorites = async (id) => {
+  // Ref. função refatorada tendo como fonte de estudo os seguintes repositorios:
+  // https://github.com/tryber/sd-018-a-project-trybetunes/pull/7
+  // https://github.com/tryber/sd-018-a-project-trybetunes/pull/3
+  handleFavorites = async (trackId) => {
     const { favorites } = this.state;
 
     this.setState({ isLoading: true });
 
-    if (favorites.includes(id)) {
-      await removeSong(id);
-      this.setState({ isLoading: false, favorites: favorites.slice(id) });
+    if (favorites.includes(trackId)) {
+      await removeSong(trackId);
+      const updateFavorites = favorites
+        .filter((oldTrackId) => trackId !== oldTrackId);
+      this.setState({ isLoading: false, favorites: updateFavorites });
     } else {
-      await addSong(id);
+      await addSong(trackId);
       this.setState({
-        favorites: [...favorites, id],
+        favorites: [...favorites, trackId],
         isLoading: false,
       });
     }
@@ -65,7 +70,7 @@ class Album extends React.Component {
                 key={ trackName }
                 musicName={ trackName }
                 sample={ previewUrl }
-                onChange={ () => this.addToFavorites(trackId) }
+                onChange={ () => this.handleFavorites(trackId) }
                 isChecked={ favorites.includes(trackId) }
               />
             </div>
