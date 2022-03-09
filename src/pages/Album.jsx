@@ -16,12 +16,15 @@ class Album extends React.Component {
   componentDidMount = async () => {
     const { match: { params: { id } } } = this.props;
 
-    const savedFavorites = await getFavoriteSongs();
+    // Refatorado com a dica postada pelo André Noel no Slack
+    const [savedFavorites, trackList] = await Promise.all([
+      getFavoriteSongs(), getMusics(id),
+    ]);
+
     this.setState({
       favorites: savedFavorites.map((e) => e.trackId),
     });
 
-    const trackList = await getMusics(id);
     const { artistName, collectionName } = trackList[0];
     this.setState({
       // Ref. https://www.delftstack.com/pt/howto/javascript/javascript-remove-first-element-from-array/
